@@ -64,14 +64,17 @@ def predict_fn(input_data, model):
     
     if model.word_dict is None:
         raise Exception('Model has not been loaded properly, no word_dict.')
-    
+            
     # TODO: Process input_data so that it is ready to be sent to our model.
     #       You should produce two variables:
     #         data_X   - A sequence of length 500 which represents the converted review
     #         data_len - The length of the review
 
-    data_X = None
-    data_len = None
+    # Preprocess into list of word radicals
+    data_X = review_to_words(input_data)
+    
+    # Convert to 500-length BoW vector
+    data_X, data_len = convert_and_pad(model.word_dict, data_X, pad=500)
 
     # Using data_X and data_len we construct an appropriate input tensor. Remember
     # that our model expects input data of the form 'len, review[500]'.
@@ -87,6 +90,7 @@ def predict_fn(input_data, model):
     # TODO: Compute the result of applying the model to the input data. The variable `result` should
     #       be a numpy array which contains a single integer which is either 1 or 0
 
-    result = None
+    result = model(data).detach().numpy()
+    result = np.around(result).astype('int32')
 
     return result
